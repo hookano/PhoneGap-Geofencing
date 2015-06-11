@@ -27,6 +27,7 @@
         </config-file>
         <header-file src="src/ios/src/DGGeofencing.h" />
         <source-file src="src/ios/src/DGGeofencing.m" />
+        <framework src="CoreLocation.framework" />
     </platform>
 
 	<platform name="android">
