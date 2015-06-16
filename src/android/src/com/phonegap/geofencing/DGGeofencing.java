@@ -113,7 +113,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 		geofencingCallbacks = null;	 
 		
 		if (receiver != null) {			
-			cordova.getActivity().unregisterReceiver(receiver);
+//			cordova.getActivity().unregisterReceiver(receiver);
 		}
 	}
 
@@ -155,7 +155,8 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 		        if(checkGeofencingAvailable())
 		        {
 		        	this.startMonitoringRegion(regionId, latitude, longitude, radius);
-		        	registerListener();
+		        	//this was causing duplicate callbacks, the listner should be registered already as it is declared in the AndroidManifest
+					//registerListener();
 		        	
 					JSONObject returnInfo = new JSONObject();				
 					returnInfo.put("timestamp", System.currentTimeMillis());
@@ -330,7 +331,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	    Intent intent = new Intent(PROXIMITY_ALERT_INTENT);
 	    intent.putExtra("id", id);
 	    
-	    return PendingIntent.getBroadcast(context, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+	    return PendingIntent.getBroadcast(context, id.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
 	public void addLocationChangedListener(LocationChangedListener listener) {
@@ -346,7 +347,8 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	}
 	
 	void fireLocationChangedEvent(final Location location) {
-		Log.d(TAG, "fireLocationChangedEvent");
+
+//		Log.d(TAG, "fireLocationChangedEvent");
 		
 		JSONObject returnInfo = new JSONObject();
 		try
@@ -380,6 +382,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	}
 
 	private void registerListener() {
+
 		IntentFilter filter = new IntentFilter(PROXIMITY_ALERT_INTENT);
 		receiver = new BroadcastReceiver() {
 			@Override
@@ -388,9 +391,12 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 			}
 		};
 		context.registerReceiver(receiver, filter);
+
 	}
 
 	void fireRegionChangedEvent(final Intent intent) {
+//		Log.d(TAG, "fireRegionChangedEvent...");
+
 		String status = intent.getBooleanExtra(LocationManager.KEY_PROXIMITY_ENTERING, false) ? "entering" : "exiting";
 		String regionId = (String) intent.getExtras().get("id");
 		
@@ -451,6 +457,8 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
   
 	private void successCallback(final JSONObject returnInfo)
 	{
+//		Log.d(TAG, "successCallback...");
+
     	if (geofencingCallbacks == null)
     	{
 			JSONObject returnErrorInfo = new JSONObject();
@@ -482,6 +490,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	
 	private void errorCallback(final JSONObject returnInfo)
 	{
+//		Log.d(TAG, "errorCallback JSON...");
     	if (geofencingCallbacks == null)
     	{
 			JSONObject returnErrorInfo = new JSONObject();
@@ -513,6 +522,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	
 	private void errorCallback(final String returnInfo)
 	{
+///		Log.d(TAG, "errorCallback JSON...");
     	if (geofencingCallbacks == null)
     	{
 			JSONObject returnErrorInfo = new JSONObject();
