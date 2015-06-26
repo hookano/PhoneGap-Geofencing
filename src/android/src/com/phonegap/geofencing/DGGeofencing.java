@@ -111,10 +111,6 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	{
 		context = null;
 		geofencingCallbacks = null;	 
-		
-		if (receiver != null) {			
-			cordova.getActivity().unregisterReceiver(receiver);
-		}
 	}
 
 	@Override
@@ -155,7 +151,6 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 		        if(checkGeofencingAvailable())
 		        {
 		        	this.startMonitoringRegion(regionId, latitude, longitude, radius);
-		        	registerListener();
 		        	
 					JSONObject returnInfo = new JSONObject();				
 					returnInfo.put("timestamp", System.currentTimeMillis());
@@ -330,7 +325,9 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	    Intent intent = new Intent(PROXIMITY_ALERT_INTENT);
 	    intent.putExtra("id", id);
 	    
-	    return PendingIntent.getBroadcast(context, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+	    //PendingIntents need to vary by more than just "extra" data, just taking a hashcode of the id passed in so that 
+	    //we don't have to change the interface, however hashCodes are not guaranteed to be unique...
+	    return PendingIntent.getBroadcast(context, id.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
 	public void addLocationChangedListener(LocationChangedListener listener) {
@@ -346,7 +343,8 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	}
 	
 	void fireLocationChangedEvent(final Location location) {
-		Log.d(TAG, "fireLocationChangedEvent");
+
+//		Log.d(TAG, "fireLocationChangedEvent");
 		
 		JSONObject returnInfo = new JSONObject();
 		try
@@ -379,16 +377,6 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	    object.put(prefix + "_longitude", location.getLongitude());
 	}
 
-	private void registerListener() {
-		IntentFilter filter = new IntentFilter(PROXIMITY_ALERT_INTENT);
-		receiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, final Intent intent) {
-				fireRegionChangedEvent(intent);
-			}
-		};
-		context.registerReceiver(receiver, filter);
-	}
 
 	void fireRegionChangedEvent(final Intent intent) {
 		String status = intent.getBooleanExtra(LocationManager.KEY_PROXIMITY_ENTERING, false) ? "entering" : "exiting";
