@@ -12,6 +12,15 @@ function DGGeofencing() {
 }
 
 /*
+Params:
+NONE
+*/
+DGGeofencing.prototype.isRunningInBackground = function (params, success, fail) {
+   return Cordova.exec(success, fail, "DGGeofencing", "isRunningInBackground", params);
+};
+
+
+/*
  Params:
  NONE
  */
