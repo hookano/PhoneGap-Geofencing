@@ -147,6 +147,19 @@
 
 #pragma mark Plugin Functions
 
+
+- (void) isRunningInBackground:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"DEBUG: isRunningInBackground");
+    
+    UIApplicationState state = [UIApplication sharedApplication].applicationState;
+    BOOL isBackground = (state == UIApplicationStateBackground);
+    
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isBackground];
+    
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 - (void) initCallbackForRegionMonitoring:(CDVInvokedUrlCommand *)command {
     NSString* callbackId = command.callbackId;
     if (!self.locationData) {

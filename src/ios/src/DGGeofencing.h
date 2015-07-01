@@ -62,6 +62,7 @@ typedef NSUInteger DGGeofencingStatus;
 - (BOOL) isSignificantLocationChangeMonitoringAvailable;
 
 #pragma mark Plugin Functions
+- (void) isRunningInBackground:(CDVInvokedUrlCommand*)command;
 - (void) initCallbackForRegionMonitoring:(CDVInvokedUrlCommand*)command;
 - (void) startMonitoringRegion:(CDVInvokedUrlCommand*)command;
 - (void) stopMonitoringRegion:(CDVInvokedUrlCommand*)command;
