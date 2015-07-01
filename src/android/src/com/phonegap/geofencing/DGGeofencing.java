@@ -9,6 +9,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
+
+
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -24,6 +26,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+
+import android.content.SharedPreferences;
 
 
 
@@ -41,7 +45,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	private Location oldLocation;
 	private boolean listening = false;
 	
-	private BroadcastReceiver receiver;
+	private ProximityReceiver receiver;
 	  
 	private static DGGeofencing instance;
 	
@@ -49,6 +53,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	  
 	private CallbackContext geofencingCallbacks;
 	private CallbackContext currentCallbacks;
+
 
 	
 	enum DGLocationStatus
@@ -124,6 +129,13 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 			{
 				geofencingCallbacks = callbackContext;	 
 				
+				SharedPreferences settings = getSharedPreferences(TAG, 0);
+				SharedPreferences.Editor editor = settings.edit();
+		        editor.putString("apiurl", data.getString(0));
+		        editor.putString("user", data.getString(1));
+		        editor.putString("pass", data.getString(2));
+				editor.commit();
+
 				JSONObject returnInfo = new JSONObject();				
 				returnInfo.put("timestamp", System.currentTimeMillis());
 				returnInfo.put("message", "Region monitoring callback added");
@@ -379,21 +391,25 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 
 
 	void fireRegionChangedEvent(final Intent intent) {
-		String status = intent.getBooleanExtra(LocationManager.KEY_PROXIMITY_ENTERING, false) ? "entering" : "exiting";
+		    Log.d(TAG, "in fireREgionChangeEevent " + intent);
+
+		String status = intent.getBooleanExtra(LocationManager.KEY_PROXIMITY_ENTERING, false) ? "enter" : "exit";
 		String regionId = (String) intent.getExtras().get("id");
 		
+		Log.d(TAG, "geofencingCallbacks = "+geofencingCallbacks);
+
 		if (geofencingCallbacks != null)
 		{
 			JSONObject returnInfo = new JSONObject();				
 
-			if (status.equals("entering"))
+			if (status.equals("enter"))
 			{
 				try
 				{
 					returnInfo.put("timestamp", System.currentTimeMillis());
 					returnInfo.put("message", "Region was entered");
 					returnInfo.put("regionId", regionId);
-					returnInfo.put("callbacktype", "enter");
+					returnInfo.put("callbacktype", status);
 			    }
 				catch(JSONException ex)
 			    {
@@ -409,7 +425,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 					returnInfo.put("timestamp", System.currentTimeMillis());
 					returnInfo.put("message", "Region was exited");
 					returnInfo.put("regionId", regionId);
-					returnInfo.put("callbacktype", "exit");
+					returnInfo.put("callbacktype", status);
 			    }
 				catch(JSONException ex)
 			    {
@@ -419,9 +435,18 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 			    }				
 			}
 			
+			Log.d(TAG, "call successCallback:"+returnInfo);
 			successCallback(returnInfo);
 		}
+		else {
+			//App was terminated, so the callback bridge is gone
+			//Send the coords directly to the server...
+			RegionPostToServer.scheduleRegionChange(regionId, status);
+		}
 	}
+	
+
+
 
 	private JSONObject parseParameters(JSONArray data) throws JSONException
 	{
