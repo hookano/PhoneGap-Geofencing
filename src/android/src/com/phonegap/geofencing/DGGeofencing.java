@@ -49,7 +49,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	  
 	private static DGGeofencing instance;
 	
-	private Context context;
+	public Context context;
 	  
 	private CallbackContext geofencingCallbacks;
 	private CallbackContext currentCallbacks;
@@ -129,7 +129,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 			{
 				geofencingCallbacks = callbackContext;	 
 				
-				SharedPreferences settings = getSharedPreferences(TAG, 0);
+				SharedPreferences settings = context.getSharedPreferences(TAG, 0);
 				SharedPreferences.Editor editor = settings.edit();
 		        editor.putString("apiurl", data.getString(0));
 		        editor.putString("user", data.getString(1));
@@ -441,7 +441,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 		else {
 			//App was terminated, so the callback bridge is gone
 			//Send the coords directly to the server...
-			RegionPostToServer.scheduleRegionChange(regionId, status);
+			RegionPostToServer.scheduleRegionChange(context.getSharedPreferences(TAG, 0), regionId, status);
 		}
 	}
 	

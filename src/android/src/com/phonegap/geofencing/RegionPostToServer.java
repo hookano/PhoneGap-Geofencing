@@ -20,25 +20,12 @@ import android.util.Log;
 
 import android.content.SharedPreferences;
 
-
-
-import static com.phonegap.geofencing.DGGeofencing.TAG;
-
 public class RegionPostToServer {
-    protected static String apiurl = "http://NeedtoSet-apiurl-oninit";
-    protected static String user = "";
-    protected static String pass = "";
+    public static final String TAG = "Geofencing"; 
     
-    static {
-        SharedPreferences  settings = Context.getApplicationContext().getSharedPreferences();
-        apiurl = settings.getString("apiurl");
-        user = settings.getString("user");
-        pass = settings.getString("pass");
-    }
-
-    protected static void scheduleRegionChange(String regionId, String status) {
+    protected static void scheduleRegionChange(SharedPreferences settings, String regionId, String status) {
         PostRegionChangeTask task = new RegionPostToServer.PostRegionChangeTask();
-        task.setRegion(regionId, status);
+        task.setRegion(settings, regionId, status);
         
         Log.d(TAG, "beforeexecute " +  task.getStatus());
 
@@ -52,16 +39,18 @@ public class RegionPostToServer {
 	protected static class PostRegionChangeTask extends AsyncTask<Object, Integer, Boolean> {
 		String regionId;
 		String status;
-        
-        public void setRegion(String regionId, String status) {
+        SharedPreferences settings;
+
+        public void setRegion(SharedPreferences settings, String regionId, String status) {
         	this.regionId = regionId;
         	this.status = status;
+            this.settings = settings;
         }
         @Override
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
             
-            postRegionChange(regionId, status);
+            postRegionChange(settings, regionId, status);
             return true;
         }
         @Override
@@ -70,23 +59,23 @@ public class RegionPostToServer {
         }
     }
 
-	 protected static boolean postRegionChange(String regionId, String status) {
+	 protected static boolean postRegionChange(SharedPreferences settings, String regionId, String status) {
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
 
 
  			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		    nameValuePairs.add(new BasicNameValuePair("j_username", user));
-		    nameValuePairs.add(new BasicNameValuePair("j_password", pass));
+		    nameValuePairs.add(new BasicNameValuePair("j_username", settings.getString("user", "user")));
+		    nameValuePairs.add(new BasicNameValuePair("j_password", settings.getString("pass", "pass")));
 
-		    HttpPost authRequest = new HttpPost(apiurl+"/api/authentication");
+		    HttpPost authRequest = new HttpPost(settings.getString("apiurl", "http://needtoset-apiurl")+"/api/authentication");
 //			authRequest.setHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded;charset=UTF-8");
 			authRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 			HttpResponse authResponse = httpClient.execute(authRequest);
 		    Log.d(TAG, "Auth Response:"+ authResponse.getStatusLine());
 		    authResponse.getEntity().consumeContent();
 
-            HttpPost request = new HttpPost(apiurl+"/api/crowds/"+regionId+"/"+status);
+            HttpPost request = new HttpPost(settings.getString("apiurl", "http://needtoset-apiurl")+"/api/crowds/"+regionId+"/"+status);
 
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);

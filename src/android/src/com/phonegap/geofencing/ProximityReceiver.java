@@ -8,10 +8,11 @@ import android.util.Log;
 
 import android.location.LocationManager;
 
+import android.content.SharedPreferences;
 
-import static com.phonegap.geofencing.DGGeofencing.TAG;
 
 public class ProximityReceiver extends BroadcastReceiver {
+  public static final String TAG = "Geofencing"; 
 
 
   @Override
@@ -26,7 +27,9 @@ public class ProximityReceiver extends BroadcastReceiver {
 		String status = intent.getBooleanExtra(LocationManager.KEY_PROXIMITY_ENTERING, false) ? "enter" : "exit";
 		String regionId = (String) intent.getExtras().get("id");
 		
-    	RegionPostToServer.scheduleRegionChange(regionId, status);
+		SharedPreferences settings = context.getSharedPreferences(TAG, 0);
+
+    	RegionPostToServer.scheduleRegionChange(settings, regionId, status);
     }
     else
     	DGGeofencing.getInstance().fireRegionChangedEvent(intent);
