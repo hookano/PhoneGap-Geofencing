@@ -35,6 +35,7 @@
         <source-file src="src/android/src/com/phonegap/geofencing/DGGeofencing.java" target-dir="src/com/phonegap/geofencing" />
         <source-file src="src/android/src/com/phonegap/geofencing/LocationChangedListener.java" target-dir="src/com/phonegap/geofencing" />
         <source-file src="src/android/src/com/phonegap/geofencing/ProximityReceiver.java" target-dir="src/com/phonegap/geofencing" />
+        <source-file src="src/android/src/com/phonegap/geofencing/RegionPostToServer.java" target-dir="src/com/phonegap/geofencing" />
 
 		<config-file target="res/xml/config.xml" parent="/*">
 			<feature name="DGGeofencing">
