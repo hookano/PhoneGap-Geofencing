@@ -114,6 +114,7 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	@Override
 	public void onDestroy() 
 	{
+		Log.d(TAG, "on Destroy...");
 		context = null;
 		geofencingCallbacks = null;	 
 	}
@@ -441,7 +442,11 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 		else {
 			//App was terminated, so the callback bridge is gone
 			//Send the coords directly to the server...
-			RegionPostToServer.scheduleRegionChange(context.getSharedPreferences(TAG, 0), regionId, status);
+			if(context != null)
+				RegionPostToServer.scheduleRegionChange(context.getSharedPreferences(TAG, 0), regionId, status);
+			else {
+				Log.d(TAG, "callback bridge gone, but so is context, cannot get sharedPrefs to post location directly...");
+			}
 		}
 	}
 	
