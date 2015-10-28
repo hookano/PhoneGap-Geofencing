@@ -115,7 +115,6 @@ public class DGGeofencing extends CordovaPlugin implements LocationListener
 	public void onDestroy() 
 	{
 		Log.d(TAG, "on Destroy...");
-		context = null;
 		geofencingCallbacks = null;	 
 	}
 
