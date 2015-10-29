@@ -50,6 +50,10 @@ DGGeofencing.prototype.stopMonitoringRegion = function (params, success, fail) {
     return Cordova.exec(success, fail, "DGGeofencing", "stopMonitoringRegion", params);
 };
 
+DGGeofencing.prototype.clearMonitoringRegions = function (params, success, fail) {
+    return Cordova.exec(success, fail, "DGGeofencing", "clearMonitoringRegions", params);
+};
+
 /*
  Params:
  NONE

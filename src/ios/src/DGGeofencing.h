@@ -66,6 +66,7 @@ typedef NSUInteger DGGeofencingStatus;
 - (void) initCallbackForRegionMonitoring:(CDVInvokedUrlCommand*)command;
 - (void) startMonitoringRegion:(CDVInvokedUrlCommand*)command;
 - (void) stopMonitoringRegion:(CDVInvokedUrlCommand*)command;
+- (void) clearMonitoringRegions:(CDVInvokedUrlCommand*)command;
 - (void) startMonitoringSignificantLocationChanges:(CDVInvokedUrlCommand*)command;
 - (void) stopMonitoringSignificantLocationChanges:(CDVInvokedUrlCommand*)command;
 

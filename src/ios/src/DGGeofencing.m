@@ -247,6 +247,15 @@
     }
 }
 
+- (void) clearMonitoringRegions:(CDVInvokedUrlCommand*)command {
+    NSSet *setOfRegions = [[self locationManager] monitoredRegions];
+
+    for (CLRegion *region in setOfRegions) {
+       NSLog (@"stop Monitoring for : %@", region);
+       [[self locationManager] stopMonitoringForRegion:region];
+    }
+}
+
 - (void) stopMonitoringRegion:(CDVInvokedUrlCommand*)command {
     DGLocationData* lData = self.locationData;
     NSString* callbackId = [lData.geofencingCallbacks objectAtIndex:0];
