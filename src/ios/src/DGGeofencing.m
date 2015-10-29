@@ -254,6 +254,9 @@
        NSLog (@"stop Monitoring for : %@", region);
        [[self locationManager] stopMonitoringForRegion:region];
     }
+    
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:true];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) stopMonitoringRegion:(CDVInvokedUrlCommand*)command {
